@@ -15,7 +15,12 @@
 ---
 
 ## フォルダ構成
-
+HealthShare/
+├──WatchApp/ ← AppleWatch側のコード
+├──iPhoneApp/ ← iPhoneアプリ側のコード
+├──Dashboard/ ← PC/スマホ表示用のコード
+├──Docs/ ← 仕様書・マニュアル
+└── README.md ← このファイル
 
 ---
 
