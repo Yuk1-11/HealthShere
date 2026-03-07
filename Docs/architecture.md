@@ -80,8 +80,8 @@ HealthShareはApple Watchの心拍数をリアルタイムで共有できるサ�
 - CSS
 - JavaScript
 - Chart.js
+- Node.js
 - Firebase SDK
-
 
 ---
 
@@ -100,7 +100,7 @@ HealthShareはApple Watchの心拍数をリアルタイムで共有できるサ�
 - JavaScript
 - Firebase Authentication
 - Firebase Hosting
-
+- Vim
 
 ---
 
