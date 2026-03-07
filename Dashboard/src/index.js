@@ -1,48 +1,58 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import Chart from "chart.js/auto";
 
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
-import { Chart } from "chart.js";
-
-// 環境変数から Firebase 設定を読み込む
+// Firebase 設定
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const chartsDiv = document.getElementById('charts');
+const authDiv = document.getElementById('auth');
+const authMessage = document.getElementById('authMessage');
+const logoutBtn = document.getElementById('logoutBtn');
 
 const charts = {};
-const chartsDiv = document.getElementById("charts");
-const authDiv = document.getElementById("auth");
-const authMessage = document.getElementById("authMessage");
-const logoutBtn = document.getElementById("logoutBtn");
 
+// チャート作成
 function createChart(userId) {
-  const canvas = document.createElement("canvas");
-  canvas.id = "chart_" + userId;
+  const canvas = document.createElement('canvas');
+  canvas.id = 'chart_' + userId;
   canvas.width = 400;
   canvas.height = 200;
   chartsDiv.appendChild(canvas);
 
-  const ctx = canvas.getContext("2d");
-  charts[userId] = new Chart(ctx, {
-    type: "line",
-    data: { labels: [], datasets: [{ label: "BPM", data: [], borderColor: "rgb(75,192,192)", tension: 0.3 }] },
+  charts[userId] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'BPM',
+        data: [],
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.3
+      }]
+    },
     options: {
       scales: {
-        x: { title: { display: true, text: "Time" } },
-        y: { title: { display: true, text: "BPM" }, min: 40, max: 180 }
+        x: { title: { display: true, text: 'Time' } },
+        y: { title: { display: true, text: 'BPM' }, min: 40, max: 180 }
       }
     }
   });
 }
 
+// Firestore リアルタイム監視
 function startListening() {
-  db.collection("heartRates").orderBy("timestamp", "asc").limit(100).onSnapshot(snapshot => {
+  const q = query(collection(db, "heartRates"), orderBy("timestamp", "asc"), limit(100));
+  onSnapshot(q, snapshot => {
     snapshot.docChanges().forEach(change => {
       if (change.type === "added") {
         const data = change.doc.data();
@@ -66,32 +76,32 @@ function startListening() {
 }
 
 // 認証フォーム
-document.getElementById("signupBtn").onclick = () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(() => { authMessage.textContent = "登録成功！ログインしてください"; })
+document.getElementById('signupBtn').onclick = () => {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => { authMessage.textContent = '登録成功！ログインしてください'; })
     .catch(err => { authMessage.textContent = err.message; });
 };
 
-document.getElementById("loginBtn").onclick = () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  auth.signInWithEmailAndPassword(email, password)
+document.getElementById('loginBtn').onclick = () => {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  signInWithEmailAndPassword(auth, email, password)
     .catch(err => { authMessage.textContent = err.message; });
 };
 
-logoutBtn.onclick = () => { auth.signOut(); };
+logoutBtn.onclick = () => { signOut(auth); };
 
-auth.onAuthStateChanged(user => {
+onAuthStateChanged(auth, user => {
   if (user) {
-    authDiv.style.display = "none";
-    logoutBtn.style.display = "block";
+    authDiv.style.display = 'none';
+    logoutBtn.style.display = 'block';
     startListening();
   } else {
-    authDiv.style.display = "block";
-    logoutBtn.style.display = "none";
-    chartsDiv.innerHTML = "";
+    authDiv.style.display = 'block';
+    logoutBtn.style.display = 'none';
+    chartsDiv.innerHTML = '';
     for (let c in charts) delete charts[c];
   }
 });
