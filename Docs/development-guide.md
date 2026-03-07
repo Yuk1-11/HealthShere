@@ -104,13 +104,6 @@ https://PROJECT.web.app
 - 4 push
 - 5 Pull Request
 
-例
-
-git checkout -b feature/login
-git add .
-git commit -m "Add login page"
-git push origin feature/login
-
  ---
 
 # 8 コーディングルール
@@ -126,12 +119,6 @@ git push origin feature/login
 # 9 Issue管理
 
 新しいタスクはGitHub Issueで管理します。
-
-例
-
-#1 ログインページ作成
-#2 心拍グラフ表示
-#3 AppleWatchデータ送信
 
  ---
 
