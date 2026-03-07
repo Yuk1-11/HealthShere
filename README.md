@@ -65,6 +65,8 @@ HealthShare/
 │   ├── marketing-site  公式サイト
 │   └── dashboard       心拍ダッシュボード
 ├── Docs/               設計書
+├── firestore.json
+├── firestore.lules     
 └── README.md
 ```
 
