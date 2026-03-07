@@ -1,25 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HealthShare Dashboard</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { text-align: center; }
-    #charts { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-    canvas { background: #f8f8f8; border: 1px solid #ddd; border-radius: 5px; }
-    #auth { max-width: 400px; margin: 0 auto; text-align: center; }
-    input { display: block; width: 100%; margin: 8px 0; padding: 8px; }
-    button { padding: 8px 16px; margin: 5px; }
-  </style>
 </head>
 <body>
-
   <h1>HealthShare Dashboard</h1>
-
-  <div id="auth">
+  <div id="charts"></div>
+  <div id=th">
     <h2>ログイン / サインアップ</h2>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
@@ -29,8 +18,6 @@
     <p id="authMessage"></p>
   </div>
 
-  <div id="charts"></div>
-
-  <script src="./index.js"></script>
+  <script type="module" src="./index.js"></script>
 </body>
 </html>
