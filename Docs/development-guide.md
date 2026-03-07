@@ -39,15 +39,11 @@ npm install -g firebase-tools
 
 firebase --version
 
----
-
 ### 2 Firebaseログイン
 
 firebase login
 
 ブラウザが開きログインします。
-
----
 
 ### 3 プロジェクト接続
 
