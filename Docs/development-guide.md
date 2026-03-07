@@ -23,7 +23,7 @@
 
 GitHubからプロジェクトを取得します。
 
-git clone https://github.com/USERNAME/HealthShare.git
+```git clone https://github.com/USERNAME/HealthShare.git```
 
 cd HealthShare
 
@@ -33,21 +33,21 @@ cd HealthShare
 
 ### 1 Firebase CLIインストール
 
-npm install -g firebase-tools
+```npm install -g firebase-tools```
 
 確認
 
-firebase --version
+```firebase --version```
 
 ### 2 Firebaseログイン
 
-firebase login
+```firebase login```
 
 ブラウザが開きログインします。
 
 ### 3 プロジェクト接続
 
-firebase use --add
+```firebase use --add```
 
 HealthShareプロジェクトを選択します。
 
@@ -57,17 +57,17 @@ HealthShareプロジェクトを選択します。
 
 Webサイトは
 
-Web/marketing-site
+```Web/marketing-site```
 
 で開発します。
 
 ### ローカルサーバー起動
 
-firebase serve
+```firebase serve```
 
 ブラウザで確認
 
-http://localhost:5000
+```http://localhost:5000```
 
 ---
 
@@ -75,8 +75,7 @@ http://localhost:5000
 
 Firebase設定は
 
-firebase-config.js
-
+```firebase-config.js```
 
 に保存します。
 
@@ -86,11 +85,11 @@ firebase-config.js
 
 Webサイトを公開する場合
 
-firebase deploy
+```firebase deploy```
 
 公開URL
 
-https://PROJECT.web.app
+```https://PROJECT.web.app```
 
  ---
 
