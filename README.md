@@ -1,54 +1,141 @@
-# HealthShere
+<div align="center">
 
-## プロジェクト概要
-**HealthShare** は Apple Watch の心拍データを iPhone で受信し、Firebase を介して PC/スマホダッシュボードに共有する健康管理アプリです。
+# ❤️ HealthShare
 
-目的：
-- 高齢者見守り
-- カップルや友人との心拍共有
+### Apple Watch Heart Rate Sharing Platform
 
-対象：
-- Apple Watch（WatchOS）
-- iPhone（iOS）
-- PC/スマホブラウザ（ダッシュボード）
+Apple Watchの心拍数をリアルタイムで共有できるサービス
 
----
+<br>
 
-## チーム分担
+![Swift](https://img.shields.io/badge/Swift-iOS-orange)
+![Firebase](https://img.shields.io/badge/Firebase-Backend-yellow)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-| 役割 | 担当作業 |
-|------|-----------|
-| Watch担当 | 心拍取得、WatchConnectivity送信 |
-| iPhone担当 | データ受信、Firebase送信、UI表示 |
-| Dashboard担当 | PC/スマホでグラフ・テーブル表示 |
-| UI/UX担当 | デザイン改善、ボタン・画面レイアウト |
-| ダミーデータ担当 | テスト用データ作成・シナリオ |
+</div>
 
 ---
 
-## 作業フロー（Git）
+## 📖 Overview
 
-1. `git clone` でリポジトリをローカルにコピー
-2. 新しい作業は **feature/〇〇** ブランチで開始
-3. 作業完了後は Pull Request を作成
-4. レビュー後、main ブランチにマージ
-5. 定期的に main を pull して最新状態を反映
+HealthShareはApple Watchから取得した心拍数をクラウドに送信し、
+家族・恋人・介護者などとリアルタイムで共有できるシステムです。
 
----
+主な利用シーン
 
-## 環境構築
-
-- **Mac + Xcode**（Apple Watch / iPhone 開発用）
-- **Apple Developer アカウント**（公開用）
-- **Firebase プロジェクト**（Realtime Database, Authentication, Cloud Messaging）
+* 👴 高齢者見守り
+* ❤️ カップル共有
+* 👨‍👩‍👧 家族健康管理
 
 ---
 
-## ダミーデータ利用方法
+## 🏗 System Architecture
 
-Apple Watch がない場合でもテスト可能：
-```swift
-let simulatedHeartRates = [72, 85, 65, 90, 78]
-for bpm in simulatedHeartRates {
-    sendHeartRateToFirebase(bpm)
-}
+```
+Apple Watch
+     ↓
+iPhone App
+     ↓
+Firebase
+     ↓
+Web Dashboard
+     ↓
+Marketing Site
+```
+
+---
+
+## 🚀 Features
+
+* ⌚ Apple Watch 心拍取得
+* ☁️ Firebase リアルタイム共有
+* 📊 Webダッシュボード表示
+* 🔐 Firebase Authentication
+* 🚨 心拍異常通知（予定）
+
+---
+
+## 📂 Project Structure
+
+```
+HealthShare/
+├── WatchApp/           AppleWatchアプリ
+├── iPhoneApp/          iPhoneアプリ
+├── Web/
+│   ├── marketing-site  公式サイト
+│   └── dashboard       心拍ダッシュボード
+├── Docs/               設計書
+└── README.md
+```
+
+---
+
+## ⚙️ Tech Stack
+
+| 技術              | 用途                     |
+| --------------- | ---------------------- |
+| Swift           | iPhone / AppleWatchアプリ |
+| HealthKit       | 心拍取得                   |
+| Firebase        | Backend                |
+| Firestore       | データ保存                  |
+| Firebase Auth   | ユーザー認証                 |
+| HTML / CSS / JS | Web                    |
+
+---
+
+## 🧑‍💻 Development Setup
+
+### リポジトリ取得
+
+```
+git clone https://github.com/YOURNAME/HealthShare.git
+cd HealthShare
+```
+
+### Firebase CLI
+
+```
+npm install -g firebase-tools
+firebase login
+```
+
+### ローカル起動
+
+```
+firebase serve
+```
+
+---
+
+## 📊 Roadmap
+
+* Apple Watch 心拍送信
+* Webリアルタイムグラフ
+* 心拍異常通知
+* 家族共有機能
+* クラウドファンディング
+
+---
+
+## 🤝 Contributing
+
+プロジェクトへの参加を歓迎します。
+
+1. Fork
+2. Branch作成
+3. Commit
+4. Pull Request
+
+---
+
+## 📜 License
+
+MIT License
+
+---
+
+<div align="center">
+
+Made with ❤️ for Health Monitoring
+
+</div>
