@@ -80,15 +80,6 @@ firebase-config.js
 
 に保存します。
 
-例
-
-```javascript
-export const firebaseConfig = {
- apiKey: "YOUR_API_KEY",
- authDomain: "PROJECT.firebaseapp.com",
- projectId: "PROJECT_ID",
-};
-
  ---
 
 # 6 デプロイ
