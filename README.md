@@ -90,7 +90,7 @@ HealthShare/
 ### リポジトリ取得
 
 ```
-git clone https://github.com/YOURNAME/HealthShare.git
+git clone https://github.com/yuk1-11/HealthShare.git
 cd HealthShare
 ```
 
