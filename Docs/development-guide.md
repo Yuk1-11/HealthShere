@@ -23,7 +23,7 @@
 
 GitHubからプロジェクトを取得します。
 
-```git clone https://github.com/USERNAME/HealthShare.git```
+```git clone https://github.com/Yuk1-11/HealthShare.git```
 
 cd HealthShare
 
