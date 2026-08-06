@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>HealthShare</title>
+      <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+      <!-- 認証セクション -->
+      <div class="auth-section">
+        <h1>❤️ HealthShare</h1>
+        
+        <div class="form-group">
+          <label for="emailInput">📧 メールアドレス</label>
+          <input id="emailInput" type="email" placeholder="example@healthshare.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="passwordInput">🔒 パスワード</label>
+          <input id="passwordInput" type="password" placeholder="8文字以上の安全なパスワード" autocomplete="current-password">
+          <div id="passwordStrength" class="password-strength"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="nameInput">👤 お名前</label>
+          <input id="nameInput" type="text" placeholder="山田太郎" autocomplete="name">
+        </div>
+
+        <div class="button-group">
+          <button id="registerBtn" type="button" data-tooltip="Ctrl+Shift+R">新規登録</button>
+          <button id="loginBtn" type="button" data-tooltip="Ctrl+Enter">ログイン</button>
+          <button id="logoutBtn" type="button" data-tooltip="Ctrl+Shift+L" style="display: none;">ログアウト</button>
+        </div>
+      </div>
+
+      <!-- プロフィール管理セクション -->
+      <div id="profileSection" style="display: none;">
+        <h2>👤 プロフィール管理</h2>
+        
+        <div class="profile-card">
+          <div class="profile-image-section">
+            <img id="profileImagePreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23667eea'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='white' font-size='40'%3E👤%3C/text%3E%3C/svg%3E" alt="プロフィール画像" class="profile-image">
+            <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+            <button id="changeImageBtn" type="button">📷 画像を変更</button>
+          </div>
+
+          <div class="profile-form">
+            <div class="form-group">
+              <label for="profileNameInput">お名前</label>
+              <input id="profileNameInput" type="text" placeholder="名前を入力">
+            </div>
+
+            <div class="form-group">
+              <label for="profileBioInput">自己紹介</label>
+              <textarea id="profileBioInput" placeholder="自己紹介を入力..." rows="3"></textarea>
+            </div>
+
+            <button id="saveProfileBtn" type="button" class="btn-primary">💾 プロフィールを保存</button>
+          </div>
+        </div>
+
+        <div class="security-section">
+          <h3>🔐 セキュリティ</h3>
+          
+          <div class="form-group">
+            <label for="currentPassword">現在のパスワード</label>
+            <input id="currentPassword" type="password" placeholder="現在のパスワード">
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">新しいパスワード</label>
+            <input id="newPassword" type="password" placeholder="新しいパスワード">
+          </div>
+
+          <button id="changePasswordBtn" type="button" class="btn-secondary">🔑 パスワードを変更</button>
+        </div>
+
+        <div class="danger-section">
+          <h3>⚠️ 危険な操作</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">アカウントを削除すると、すべてのデータが失われます。この操作は取り消せません。</p>
+          <button id="deleteAccountBtn" type="button" class="btn-danger">🗑️ アカウントを削除</button>
+        </div>
+      </div>
+
+      <!-- HealthShareについて -->
+      <div class="info-section">
+        <h1>ℹ️ HealthShareについて</h1>
+
+        <h2>📋 概要</h2>
+            <p>
+              HealthShareは、AppleWatchの心拍データをiPhoneで受信し、Firebaseを介してPC/スマホダッシュボードに共有する健康管理アプリです。
+            </p>
+
+        <h2>🎯 目的</h2>
+        <ul>
+            <li>
+              高齢者などが家に一人でいる際に、その健康状態を常時チェックするため
+            </li>
+            <li>
+              家族や友人、恋人との間での心拍共有を行うため
+            </li>
+        </ul>
+
+        <div style="margin-top: 24px; text-align: center;">
+          <a href="dashboard.html" class="btn-primary" style="display: inline-block; padding: 14px 32px; font-size: 1.1rem; text-decoration: none;">
+            📊 心拍ダッシュボードへ
+          </a>
+        </div>
+      </div>
+
+      <!-- ショートカットヘルプ -->
+      <div class="shortcuts-help">
+        <h3>⌨️ キーボードショートカット</h3>
+        <div class="shortcut-item">
+          <span class="shortcut-desc">ログイン/登録フォーム送信</span>
+          <span class="shortcut-key">Ctrl + Enter</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-desc">新規登録</span>
+          <span class="shortcut-key">Ctrl + Shift + R</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-desc">ログアウト</span>
+          <span class="shortcut-key">Ctrl + Shift + L</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-desc">プロフィール保存</span>
+          <span class="shortcut-key">Ctrl + S</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-desc">ショートカットヘルプ表示</span>
+          <span class="shortcut-key">?</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-desc">フォームをクリア</span>
+          <span class="shortcut-key">Escape</span>
+        </div>
+      </div>
+
+
+      <script type="module" src="app.js"></script>
+    </body>
+</html>

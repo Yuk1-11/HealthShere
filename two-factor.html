@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthShare - 2段階認証</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 2FA専用スタイル */
+        .tfa-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tfa-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 24px;
+        }
+
+        .tfa-card h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tfa-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+
+        .status-enabled {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .status-disabled {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+        }
+
+        #qrCode {
+            margin: 16px auto;
+            padding: 16px;
+            background: white;
+            border-radius: var(--radius-md);
+            display: inline-block;
+        }
+
+        .verification-input {
+            text-align: center;
+            font-size: 2rem;
+            letter-spacing: 16px;
+            padding: 16px;
+            width: 200px;
+            margin: 16px auto;
+            display: block;
+        }
+
+        .backup-codes {
+            background: var(--bg-primary);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin: 16px 0;
+        }
+
+        .backup-codes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .backup-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            padding: 8px;
+            background: white;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            user-select: all;
+        }
+
+        .btn-enable {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-disable {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-verify {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: 2px solid var(--border-color);
+        }
+
+        .step.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .step.completed {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .warning-banner {
+            background: rgba(237, 137, 54, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin: 16px 0;
+        }
+
+        .warning-banner p {
+            color: var(--warning-color);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tfa-container">
+        <!-- ヘッダー -->
+        <div class="auth-section" style="margin-bottom: 24px;">
+            <h1>🔐 2段階認証設定</h1>
+            <p style="color: var(--text-secondary); text-align: center;">
+                アカウントのセキュリティを強化するために、2段階認証を設定しましょう。
+            </p>
+        </div>
+
+        <!-- 認証 Required セクション -->
+        <section id="authRequired" class="tfa-card" style="display: none;">
+            <h2>🔐 ログインが必要です</h2>
+            <p>2段階認証を設定するにはログインしてください。</p>
+            <a href="index.html" class="btn-primary" style="display: inline-block; margin-top: 16px;">ログインページへ</a>
+        </section>
+
+        <!-- 2FA設定セクション -->
+        <section id="tfaSection" style="display: none;">
+            <!-- ステップインジケーター -->
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+            </div>
+
+            <!-- ステップ1: 有効/無効切り替え -->
+            <div class="tfa-card" id="step1Content">
+                <h2>🛡️ 2段階認証の概要</h2>
+                
+                <div class="tfa-status">
+                    <span>現在の状態:</span>
+                    <span id="tfaStatus" class="status-disabled">無効</span>
+                </div>
+
+                <div id="tfaDisabledView">
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        2段階認証を有効にすると、ログイン時にパスワードに加えて、
+                        認証アプリで生成された6桁のコードの入力が必須になります。
+                    </p>
+                    
+                    <h3 style="margin-bottom: 12px;">必要なもの:</h3>
+                    <ul style="color: var(--text-secondary); margin-bottom: 20px; padding-left: 20px;">
+                        <li>スマートフォンまたはタブレット</li>
+                        <li>認証アプリ（Google Authenticator、Microsoft Authenticator、Authyなど）</li>
+                    </ul>
+
+                    <button id="enableBtn" class="btn-primary btn-enable" style="width: 100%;">
+                        2段階認証を有効にする
+                    </button>
+                </div>
+
+                <div id="tfaEnabledView" class="hidden">
+                    <div class="warning-banner">
+                        <p>⚠️ 2段階認証は現在有効です。無効にするには以下のボタンをクリックしてください。</p>
+                    </div>
+                    
+                    <button id="disableBtn" class="btn-secondary btn-disable" style="width: 100%;">
+                        2段階認証を無効にする
+                    </button>
+                </div>
+            </div>
+
+            <!-- ステップ2: QRコード表示と認証 -->
+            <div class="tfa-card hidden" id="step2Content">
+                <h2>📱 認証アプリの設定</h2>
+                
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    以下のQRコードを認証アプリでスキャンしてください。
+                </p>
+
+                <div class="qr-section">
+                    <div id="qrCode"></div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 12px;">
+                        または、以下のシークレットキーを手動で入力してください
+                    </p>
+                    <p id="secretKey" style="font-family: monospace; font-size: 1.1rem; margin-top: 8px; user-select: all;"></p>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        認証アプリに表示された6桁のコードを入力:
+                    </label>
+                    <input 
+                        type="text" 
+                        id="verificationCode" 
+                        class="verification-input"
+                        maxlength="6"
+                        placeholder="000000"
+                        pattern="[0-9]{6}"
+                        autocomplete="one-time-code"
+                    >
+                    <button id="verifyBtn" class="btn-primary btn-verify" style="width: 100%; margin-top: 16px;">
+                        認証コードを確認
+                    </button>
+                </div>
+
+                <button id="backToStep1" class="btn-secondary" style="width: 100%; margin-top: 12px;">
+                    戻る
+                </button>
+            </div>
+
+            <!-- ステップ3: バックアップコード -->
+            <div class="tfa-card hidden" id="step3Content">
+                <h2>✅ 2段階認証が有効になりました！</h2>
+                
+                <div class="warning-banner">
+                    <p>⚠️ 以下のバックアップコードを安全な場所に保管してください。</p>
+                    <p style="margin-top: 8px;">携帯電話を紛失した場合、これらのコードを使用してアカウントにアクセスできます。</p>
+                </div>
+
+                <div class="backup-codes">
+                    <h4 style="margin-bottom: 12px;">バックアップコード:</h4>
+                    <div class="backup-codes-grid" id="backupCodesGrid">
+                        <!-- JavaScriptで生成 -->
+                    </div>
+                </div>
+
+                <button id="downloadBackupBtn" class="btn-secondary" style="width: 100%; margin-bottom: 12px;">
+                    📥 バックアップコードをダウンロード
+                </button>
+
+                <button id="copyBackupBtn" class="btn-secondary" style="width: 100%; margin-bottom: 24px;">
+                    📋 バックアップコードをコピー
+                </button>
+
+                <a href="dashboard.html" class="btn-primary" style="display: inline-block; width: 100%; text-align: center; text-decoration: none;">
+                    ダッシュボードへ戻る
+                </a>
+            </div>
+        </section>
+
+        <!-- 高度なセキュリティ機能セクション -->
+        <section id="advancedSecuritySection" style="display: none;">
+            <!-- OTP トランザクション署名 -->
+            <div class="tfa-card">
+                <h2>🔏 OTP トランザクション署名</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    ユーザーIDとメールアドレスをOTPトークンで署名し、トランザクションの真正性を保証します。
+                </p>
+
+                <div class="tfa-status">
+                    <span>トランザクション署名:</span>
+                    <span id="transactionSigningStatus" class="status-disabled">無効</span>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        OTPコード（6桁）:
+                    </label>
+                    <input 
+                        type="text" 
+                        id="transactionSigningOtpInput"
+                        class="verification-input"
+                        maxlength="6"
+                        placeholder="000000"
+                        style="font-size: 1.5rem; width: 150px;"
+                    >
+                </div>
+
+                <button id="enableTransactionSigningBtn" class="btn-primary" style="width: 100%; margin-bottom: 12px;">
+                    トランザクション署名を有効化
+                </button>
+
+                <button id="generateSignatureBtn" class="btn-secondary" style="width: 100%;">
+                    署名を生成
+                </button>
+
+                <div id="signatureResult" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- SHA-2 パスワードハッシュ -->
+            <div class="tfa-card" id="passwordHashSection">
+                <h2>🔐 SHA-2 パスワードハッシュ</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    SHA-256、SHA-512、またはPBKDF2を使用してパスワードを安全にハッシュ化します。
+                </p>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        アルゴリズム:
+                    </label>
+                    <select id="hashAlgorithmSelect" style="width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 1rem;">
+                        <option value="SHA-256">SHA-256</option>
+                        <option value="SHA-512">SHA-512</option>
+                        <option value="PBKDF2">PBKDF2 (推奨)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        パスワード:
+                    </label>
+                    <input 
+                        type="password" 
+                        id="hashPasswordInput"
+                        placeholder="8文字以上のパスワード"
+                        style="width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 1rem;"
+                    >
+                </div>
+
+                <button id="hashPasswordBtn" class="btn-primary" style="width: 100%;">
+                    ハッシュを生成
+                </button>
+
+                <div id="passwordHashResult" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- GSS-API トークン -->
+            <div class="tfa-card" id="gssApiSection">
+                <h2>🎫 GSS-API 認証トークン</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    RFC3645/GSS-API風の認証トークンを生成・検証します。
+                </p>
+
+                <div class="tfa-status">
+                    <span>GSS-API:</span>
+                    <span id="gssApiStatus" class="status-disabled">無効</span>
+                </div>
+
+                <button id="generateGssTokenBtn" class="btn-primary" style="width: 100%; margin-bottom: 16px;">
+                    GSS-API トークンを生成
+                </button>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                        トークン検証:
+                    </label>
+                    <textarea 
+                        id="gssTokenInput"
+                        placeholder="検証するトークン文字列を貼り付け"
+                        rows="3"
+                        style="width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; font-family: monospace;"
+                    ></textarea>
+                </div>
+
+                <button id="verifyGssTokenBtn" class="btn-secondary" style="width: 100%; margin-bottom: 16px;">
+                    トークンを検証
+                </button>
+
+                <div id="gssTokenResult" style="margin-top: 20px;"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 追加スタイル -->
+    <style>
+        .signature-details, .hash-details, .gss-token-details, .token-verification-result {
+            background: var(--bg-primary);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-top: 16px;
+        }
+
+        .signature-details h4, .hash-details h4, .gss-token-details h4 {
+            margin-bottom: 12px;
+            color: var(--primary-color);
+        }
+
+        .signature-details p, .hash-details p, .gss-token-details p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .signature-json, .token-encoded pre {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: 8px;
+        }
+
+        .token-verification-result.valid {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .token-verification-result.invalid {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .token-verification-result h4 {
+            margin-bottom: 12px;
+        }
+
+        #advancedSecuritySection {
+            margin-top: 24px;
+        }
+    </style>
+
+    <!-- QRCode.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <script type="module" src="two-factor.js"></script>
+</body>
+</html>

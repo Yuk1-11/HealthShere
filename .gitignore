@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+meta.env
+.env
+*.xcworkspace
+*.xcuserdata
+*.xcuserdatad
+*.xcconfig
+*.swiftpm
+build/
+DerivedData/
+*.log

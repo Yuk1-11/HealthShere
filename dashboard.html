@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthShare - 心拍ダッシュボード</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">❤️</span>
+                <span class="logo-text">HealthShare</span>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-icon" data-tooltip="更新">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                    </svg>
+                </button>
+                <div class="user-menu">
+                    <span id="userName">ゲスト</span>
+                    <button id="logoutBtn" class="btn-secondary btn-sm">ログアウト</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        <!-- 認証セクション（ログインしていない場合に表示） -->
+        <section id="authRequired" class="auth-required" style="display: none;">
+            <div class="auth-card">
+                <h2>🔐 ログインが必要です</h2>
+                <p>心拍ダッシュボードを表示するにはログインしてください。</p>
+                <a href="index.html" class="btn-primary">ログイン・登録ページへ</a>
+            </div>
+        </section>
+
+        <!-- ダッシュボード（ログイン後に表示） -->
+        <section id="dashboard" class="dashboard" style="display: none;">
+            <!-- 現在の心拍数 -->
+            <div class="current-heart-rate-section">
+                <div class="heart-rate-card">
+                    <div class="heart-rate-display">
+                        <div class="heart-icon pulse">❤️</div>
+                        <div class="heart-rate-value">
+                            <span id="currentHeartRate">--</span>
+                            <span class="unit">bpm</span>
+                        </div>
+                    </div>
+                    <div class="heart-rate-info">
+                        <div class="info-item">
+                            <span class="info-label">状態</span>
+                            <span id="heartRateStatus" class="status-badge status-normal">正常</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">最終更新</span>
+                            <span id="lastUpdate">--:--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 統計情報 -->
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="avgHeartRate">--</span>
+                            <span class="stat-label">平均心拍数</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⬆️</div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="maxHeartRate">--</span>
+                            <span class="stat-label">最高心拍数</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⬇️</div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="minHeartRate">--</span>
+                            <span class="stat-label">最低心拍数</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="dataCount">0</span>
+                            <span class="stat-label">データ数</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 心拍数グラフ -->
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h3>📈 心拍数推移</h3>
+                    <div class="chart-controls">
+                        <select id="timeRange" class="select-control">
+                            <option value="1h">直近1時間</option>
+                            <option value="6h">直近6時間</option>
+                            <option value="24h" selected>直近24時間</option>
+                            <option value="7d">直近7日間</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="heartRateChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 履歴テーブル -->
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>📋 心拍数履歴</h3>
+                    <button id="exportBtn" class="btn-secondary btn-sm">エクスポート</button>
+                </div>
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>日時</th>
+                                <th>心拍数</th>
+                                <th>状態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- JavaScriptで動的に追加 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noDataMessage" class="no-data-message" style="display: none;">
+                    <p>まだ心拍データがありません。</p>
+                    <p class="hint">Apple Watch または iPhone アプリからデータを送信してください。</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+        <p>&copy; 2024 HealthShare. All rights reserved.</p>
+    </footer>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- ダッシュボード用JavaScript -->
+    <script type="module" src="dashboard.js"></script>
+</body>
+</html>
